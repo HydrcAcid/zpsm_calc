@@ -1,9 +1,10 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 
-const Display = ({ value }) => {
+const Display = ({ value, operation }) => {
   return (
     <View style={styles.container}>
+        <Text style={styles.small_text}>{operation}</Text>
         <Text style={styles.text}>{value}</Text>
     </View>
     );
@@ -15,12 +16,15 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'flex-end',
         padding: 20,
-        backgroundColor: '#444',    
+        backgroundColor: '#444',
     },
     text: {
-        fontSize: 72,
+        fontSize: 52,
         color: '#fff',
     },
+    small_text: {
+        color: '#fff',
+    }
 });
 
 export default Display;

@@ -1,14 +1,12 @@
 import React from 'react'
 import { StyleSheet, TouchableOpacity, Text } from 'react-native';
 
-const Button = ({ action, label, color }) => {
+const Button = ({ action, label, color, width = 1 }) => {
   const styles = StyleSheet.create({
     button: {
-      flex: 1,
+      flex: width,
       alignItems: 'center',
       justifyContent: 'center',
-      padding: 10,
-      margin: 2,
       backgroundColor: color || '#ddd',
     },
     text: {
