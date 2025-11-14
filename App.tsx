@@ -14,7 +14,7 @@ import {
 
 import Button from './components/button.jsx';
 import Display from './components/display.jsx';
-import Panel from './components/panel.jsx';
+
 import { useState } from 'react';
 
 function App() {
@@ -23,7 +23,8 @@ function App() {
     ADD,
     SUB,
     MUL,
-    DIV
+    DIV,
+    PERCENT,
   }
 
   function toFixedIfNecessary(value: Number, dp: number) {
@@ -58,6 +59,9 @@ function App() {
           return 0;
         }
         result /= r_operand;
+        break;
+      case Operator.PERCENT:
+        result = (l_operand / 100) * r_operand;
         break;
       default:
         result = r_operand;
@@ -104,16 +108,130 @@ function App() {
     setDecimalPos(1);
   }
 
+  function toggleSign() {
+    let swapped = -r_operand;
+    setR_operand(swapped);
+    setDisplayValue(toFixedIfNecessary(swapped, 8).toString());
+  }
+
   function processOperator(op: Operator, char: string) {    
     let gt = evaluation;
     if(r_operand !== 0) {
       gt = evaluate();
     }
 
-    setDisplayOperation(gt + " " + char);
-    
+    setDisplayOperation(toFixedIfNecessary(gt, 10) + " " + char);
     setOperator(op);
   }
+
+  const buttonLayoutBase = [
+    [
+        {
+            value: 'AC',
+            color: '#555',
+            action: () => { clear(); }
+        },
+        {
+            value: '+/-',
+            color: '#555',
+            action: () => { toggleSign(); }
+        },
+        {
+            value: '%',
+            color: '#555',
+            action: () => { processOperator(Operator.PERCENT, '%'); }
+        },
+        {
+            value: '÷',
+            color: '#ffa31a',
+            action: () => { processOperator(Operator.DIV, '÷'); }  
+        },
+    ],
+    [
+        {
+            value: '7',
+            color: '#777',
+            action: () => { addDigit(7); }
+        },
+        {
+            value: '8',
+            color: '#777',
+            action: () => { addDigit(8); }
+        },
+        {
+            value: '9',
+            color: '#777',
+            action: () => { addDigit(9); }
+        },
+        {
+            value: 'x',
+            color: '#ffa31a',
+            action: () => { processOperator(Operator.MUL, 'x'); }
+        },
+    ],
+    [
+        {
+            value: '4',
+            color: '#777',
+            action: () => { addDigit(4); }
+        },
+        {
+            value: '5',
+            color: '#777',
+            action: () => { addDigit(5); }
+        },
+        {
+            value: '6',
+            color: '#777',
+            action: () => { addDigit(6); }
+        },
+        {
+            value: '-',
+            color: '#ffa31a',
+            action: () => { processOperator(Operator.SUB, '-'); }
+        },
+    ],
+    [
+        {
+            value: '1',
+            color: '#777',
+            action: () => { addDigit(1); }
+        },
+        {
+            value: '2',
+            color: '#777',
+            action: () => { addDigit(2); }
+        },
+        {
+            value: '3',
+            color: '#777',
+            action: () => { addDigit(3); }
+        },
+        {
+            value: '+',
+            color: '#ffa31a',
+            action: () => { processOperator(Operator.ADD, '+'); }
+        },
+    ],
+    [
+        {
+            width: 2,
+            value: '0',
+            color: '#777',
+            action: () => { addDigit(0); }
+        },
+        {
+            value: ',',
+            color: '#777',
+            action: () => { setDecimalMode(true); }
+        },
+        {
+            value: '=',
+            color: '#ffa31a',
+            action: () => { evaluate(); }
+        },
+    ]
+  ];
 
   const isDarkMode = useColorScheme() === 'dark';
 
@@ -123,34 +241,19 @@ function App() {
       
       <Display value={displayValue} operation={displayOperation} />
       <View style={styles.button_container}>
-        <View style={styles.button_row}>
-          <Button width={1} action={() => clear()} label={"AC"} color={'#555'}/>
-            <Panel width={2} color={'#555'} />
-          <Button width={1} action={() => processOperator(Operator.DIV, '÷')} label={"÷"} color={'#ffa31a'}/>
-        </View>
-        <View style={styles.button_row}>
-          <Button action={() => addDigit(7)} label={"7"} color={'#777'}/>
-          <Button action={() => addDigit(8)} label={"8"} color={'#777'}/>
-          <Button action={() => addDigit(9)} label={"9"} color={'#777'}/>
-          <Button action={() => processOperator(Operator.MUL, 'x')} label={"x"} color={'#ffa31a'}/>
-        </View>
-        <View style={styles.button_row}>
-          <Button action={() => addDigit(4)} label={"4"} color={'#777'}/>
-          <Button action={() => addDigit(5)} label={"5"} color={'#777'}/>
-          <Button action={() => addDigit(6)} label={"6"} color={'#777'}/>
-          <Button action={() => processOperator(Operator.SUB, '-')} label={"-"} color={'#ffa31a'}/>
-        </View>
-        <View style={styles.button_row}>
-          <Button action={() => addDigit(1)} label={"1"} color={'#777'}/>
-          <Button action={() => addDigit(2)} label={"2"} color={'#777'}/>
-          <Button action={() => addDigit(3)} label={"3"} color={'#777'}/>
-          <Button action={() => processOperator(Operator.ADD, '+')} label={"+"} color={'#ffa31a'}/>
-        </View>
-        <View style={styles.button_row}>
-          <Button action={() => addDigit(0)} label={"0"} color={'#777'} width={2}/>
-          <Button action={() => setDecimalMode(true)} label={","} color={'#777'}/>
-          <Button action={() => evaluate()} label={"="} color={'#ffa31a'}/>
-        </View>
+        {buttonLayoutBase.map((row, rowIdx) => (
+          <View key={rowIdx} style={styles.button_row}>
+            {row.map((button, buttonIdx) => (
+              <Button 
+                key={buttonIdx} 
+                value={button.value} 
+                color={button.color} 
+                action={button.action}
+                width={button?.width}>
+                </Button>
+            ))}
+          </View>
+        ))}
       </View>
     </SafeAreaProvider>
   );

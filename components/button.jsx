@@ -1,7 +1,7 @@
 import React from 'react'
 import { StyleSheet, TouchableOpacity, Text } from 'react-native';
 
-const Button = ({ action, label, color, width = 1 }) => {
+const Button = ({ value, color, action, width = 1 }) => {
   const styles = StyleSheet.create({
     button: {
       flex: width,
@@ -17,9 +17,9 @@ const Button = ({ action, label, color, width = 1 }) => {
   
   return (
     <TouchableOpacity onPress={action} style={styles.button}>
-      <Text style={styles.text}>{label}</Text>
+      <Text style={styles.text}>{value}</Text>
     </TouchableOpacity>
-    )
+  )
 }
 
 
